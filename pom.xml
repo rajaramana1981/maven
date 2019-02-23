@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>andriod</groupId>
+  <artifactId>cmobileapp</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>war</packaging>
+
+  <name>mobileapp Maven Webapp</name>
+  <!-- FIXME change it to the project's website -->
+  <url>http://www.example.com</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
+     <jacoco.version>0.7.5.201505241946</jacoco.version>
+     <junit.version>4.12</junit.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+<profiles>
+<profile>
+        <id>dockerimage</id>
+         <build>
+          <plugins>
+           <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.6.0</version>
+             <executions>
+              <execution>
+               <phase>package</phase>
+               <goals>
+                <goal>exec</goal>
+                                  </goals>
+                                        <configuration>
+                                  <executable>docker</executable>
+                                   <arguments>
+                                        <argument>build</argument>
+                                        <argument>-t</argument>
+                                        <argument>dockerfile</argument>
+                                        <argument>.</argument>
+                                   </arguments>
+                                </configuration>
+                        </execution>
+                                                </executions>
+                        </plugin>
+             </plugins>
+      </build>
+    </profile>
+	
+<profile>
+ <id> Coderelease </id>
+      <plugin>
+        <!-- Code coverage plugin. -->
+        <!-- This sets up code coverage for the unit tests, the integration tests, -->
+        <!-- and the combined coverage of both. -->
+        <!-- After running a `mvn clean install`, open `target/site/jacoco-both/index.html` in a browser. -->
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco.plugin.version}</version>
+        <executions>
+          <execution>
+            <id>jacoco-prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>jacoco-prepare-agent-integration</id>
+            <goals>
+              <goal>prepare-agent-integration</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>jacoco-report</id>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>jacoco-check</id>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <configuration>
+              <rules />
+            </configuration>
+          </execution>
+          <execution>
+            <!-- Combine the code coverage statistics generated for the unit and the integration tests. -->
+            <id>jacoco-merge</id>
+            <goals>
+              <goal>merge</goal>
+            </goals>
+            <phase>verify</phase>
+            <configuration>
+              <fileSets>
+                <fileSet>
+                  <directory>${project.build.directory}</directory>
+                  <includes>
+                    <include>*.exec</include>
+                  </includes>
+                </fileSet>
+              </fileSets>
+              <destFile>${project.build.directory}/jacoco-both.exec</destFile>
+            </configuration>
+          </execution>
+          <execution>
+            <id>jacoco-integration</id>
+            <goals>
+              <goal>report-integration</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>jacoco-reportboth</id>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <configuration>
+              <dataFile>${project.build.directory}/jacoco-both.exec</dataFile>
+              <outputDirectory>${project.reporting.outputDirectory}/jacoco-both</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+     </profile>
+
+<profile>
+<id> zip </id>
+<build>
+ <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>make-bundles</id>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+              <descriptors>
+                <descriptor>src/main/assembly/zip.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+ </plugins>
+  </build>
+
+ </profile>
+
+
+</profiles>
+
+</project>
+
+
